@@ -16,6 +16,7 @@ export default class Job {
         this.type = type || 'General';
         this.callback = callback;
         this.setState(STATES.PENDING);
+        // store job object
     }
 
     getId() {
@@ -40,9 +41,11 @@ export default class Job {
         try {
             const res = await this.callback();
             this.setState(STATES.PENDING);
+            // store event ran succefully
             return res;
         } catch (error) {
             this.setState(STATES.FAILED);
+            // store event failed
             throw error;
         }
     }

@@ -36,9 +36,15 @@ export default {
     },
 
     addJobToQueue(job) {
-        if (this.jobQueue.length <= MAX_QUEUE_SIZE) {
-            this.jobQueue.push(job);
+        // if queue is full stash job for later on the engine event queue
+        if (this.jobQueue.length > MAX_QUEUE_SIZE) {
+            setTimeout(() => {
+                this.addJobToQueue(job);
+            }, 0)
         }
+
+        // store event scheduled
+        this.jobQueue.push(job);
     },
 
     run() {
@@ -47,6 +53,15 @@ export default {
 
     stop() {
         clearInterval(this.mainTimerId);
+
+        // clear all job scheduling
+        this.totalJobs.forEach(jobData => {
+            if(jobData.recurrent) {
+                clearInterval(jobData.timerId);
+            } else {
+                clearTimeout(jobData.timerId);
+            }
+        });
     },
 
     getJobsFromQueue() {
@@ -73,7 +88,7 @@ export default {
         }
 
         // run jobs async
-        await Promise.all(jobs.map(job => job.run()))
+        Promise.all(jobs.map(job => job.run()))
     },
 
     printStats() {
@@ -85,14 +100,6 @@ export default {
 
     clear() {
         this.stop();
-        this.totalJobs.forEach(jobData => {
-            if(jobData.recurrent) {
-                clearInterval(jobData.timerId);
-            } else {
-                clearTimeout(jobData.timerId);
-            }
-        });
-
         this.totalJobs = [];
         this.jobQueue = [];
     }

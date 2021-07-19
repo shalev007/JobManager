@@ -61,7 +61,4 @@ describe('JobManager', () => {
             JobManager.runJobsFromQeue();
         }, 0);
     }, 500);
-
-    it.todo(`should clear jobs`);
-
 })

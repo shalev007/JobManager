@@ -1,4 +1,4 @@
-import {v1 as uuidv1} from 'uuid';
+import JobStore from '../../Store/Job/index.js';
 
 export const STATES = {
     PENDING: 'PENDING',
@@ -7,20 +7,33 @@ export const STATES = {
 };
 
 export default class Job {
-    constructor(type, callback) {
+    constructor(type, schedule, callback) {
         if(!callback) {
             throw new Error('Missing function on creating new Job');
         }
 
-        this.id = uuidv1();
         this.type = type || 'General';
+        this.schedule = schedule;
         this.callback = callback;
         this.setState(STATES.PENDING);
-        // store job object
+
+        // store new job object
+        const { _id } = JobStore.insert(
+            this.type,
+            this.schedule,
+            this.callback,
+            this.state
+        );
+
+        this.id = _id;
     }
 
     getId() {
         return this.id;
+    }
+
+    getSchedule() {
+        return this.schedule;
     }
 
     getType() {
@@ -29,6 +42,9 @@ export default class Job {
 
     setState(state) {
         this.state = state;
+        // update store state
+        JobStore.update(this.id, { state });
+
         return this;
     }
 
@@ -41,11 +57,9 @@ export default class Job {
         try {
             const res = await this.callback();
             this.setState(STATES.PENDING);
-            // store event ran succefully
             return res;
         } catch (error) {
             this.setState(STATES.FAILED);
-            // store event failed
             throw error;
         }
     }

@@ -6,6 +6,7 @@ const JOB_VALUE = 'return value';
 describe('Job', () => {
     const job = new Job(
         JOB_TYPE,
+        {millisecond: 0, recurrent: false},
         async () => {
             return JOB_VALUE;
         }
@@ -15,8 +16,16 @@ describe('Job', () => {
         expect(job.getId()).not.toBeFalsy();
     });
 
-    it(`type should be ${JOB_TYPE}`, () => {
+    it(`type should be type ${JOB_TYPE}`, () => {
         expect(job.getType()).toBe(JOB_TYPE);
+    });
+
+    it(`type should have a schdule`, () => {
+        expect(job.getSchedule()).toEqual(
+            expect.objectContaining({
+            millisecond: 0,
+            recurrent: false
+        }));
     });
 
     it('state should be pending', () => {
@@ -34,7 +43,7 @@ describe('Job', () => {
     });
 
     it('should be on status running during run', (done) => {
-        const job = new Job('', () => {
+        const job = new Job('', {millisecond: 0, recurrent: false}, () => {
             expect(job.getState()).toBe(JOB_STATES.RUNNING);
             done();
         });
@@ -61,7 +70,7 @@ describe('Job', () => {
     });
 
     it('should have failed status when throwing an error', (done) => {
-        const job = new Job('', () => {
+        const job = new Job('', {millisecond: 0, recurrent: false}, () => {
             throw new Error('This is test error');
         });
 

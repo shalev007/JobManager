@@ -15,11 +15,12 @@ export default {
         schedule.millisecond = schedule.millisecond || 0;
         schedule.recurrent = schedule.recurrent ?? false;
 
-        const job = new Job(type, callback);
-        this.scheduleJob(job, schedule);
+        const job = new Job(type, schedule, callback);
+        this.scheduleJob(job);
     },
 
-    scheduleJob(job, schedule) {
+    scheduleJob(job) {
+        const schedule = job.getSchedule();
         let timerId;
         if (schedule.recurrent) {// schedule recurrent job
             timerId = setInterval(() => {

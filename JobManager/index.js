@@ -1,4 +1,5 @@
 import Job from './Job/index.js';
+import QueuedJobStore from '../Store/QueuedJob/index.js';
 
 export const TICK_TIME = 1000;
 export const MAX_RUNNING_JOBS = 5;
@@ -45,7 +46,8 @@ export default {
         }
 
         // store event scheduled
-        this.jobQueue.push(job);
+        const queuedJob = QueuedJobStore.insert(job);
+        this.jobQueue.push(queuedJob);
     },
 
     run() {
@@ -90,6 +92,7 @@ export default {
 
         // run jobs async
         Promise.all(jobs.map(job => job.run()))
+        // update QueuedJobStore objects
     },
 
     printStats() {

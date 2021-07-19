@@ -1,0 +1,4 @@
+// cached singleton
+export default {
+
+};

@@ -1,10 +1,11 @@
 {
-  "name": "JobManager",
+  "name": "jobmanager",
   "version": "1.0.0",
   "description": "",
   "main": "JobManager.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll",
     "start": "node server.js"
   },
   "repository": {
@@ -19,6 +20,8 @@
   },
   "homepage": "https://github.com/shalev007/JobManager#readme",
   "dependencies": {
+    "@types/jest": "^26.0.24",
+    "express": "^4.17.1",
     "jest": "^27.0.6"
   }
 }

@@ -95,17 +95,16 @@ export default {
         // update QueuedJobStore objects
     },
 
-    printStats() {
+    getStats() {
         const runningJobs = this.totalJobs.filter(({job}) => {
             return job.getState() == STATES.RUNNING;
         })
 
-
-        console.log(JSON.stringify({
+        return {
             totalJobs: this.totalJobs.length,
             queueSize: this.jobQueue.length,
             runningJobs: runningJobs.length
-        }, null, 2))
+        };
     },
 
     clear() {

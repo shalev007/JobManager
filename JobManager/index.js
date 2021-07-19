@@ -1,4 +1,4 @@
-import Job from './Job/index.js';
+import Job, { STATES } from './Job/index.js';
 import QueuedJobStore from '../Store/QueuedJob/index.js';
 
 export const TICK_TIME = 1000;
@@ -96,9 +96,15 @@ export default {
     },
 
     printStats() {
+        const runningJobs = this.totalJobs.filter(({job}) => {
+            return job.getState() == STATES.RUNNING;
+        })
+
+
         console.log(JSON.stringify({
             totalJobs: this.totalJobs.length,
-            queueSize: this.jobQueue.length
+            queueSize: this.jobQueue.length,
+            runningJobs: runningJobs.length
         }, null, 2))
     },
 

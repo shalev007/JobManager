@@ -1,3 +1,5 @@
+import {v1 as uuidv1} from 'uuid';
+
 export const STATES = {
     PENDING: 'PENDING',
     RUNNING: 'RUNNING',
@@ -5,23 +7,23 @@ export const STATES = {
 };
 
 export default class Job {
-    constructor(type, schedule, callback) {
+    constructor(type, callback) {
         if(!callback) {
             throw new Error('Missing function on creating new Job');
         }
 
+        this.id = uuidv1();
         this.type = type || 'General';
-        this.schedule = schedule || '*****';
         this.callback = callback;
         this.setState(STATES.PENDING);
     }
 
-    getType() {
-        return this.type;
+    getId() {
+        return this.id;
     }
 
-    getSchedule() {
-        return this.schedule;
+    getType() {
+        return this.type;
     }
 
     setState(state) {
@@ -34,18 +36,14 @@ export default class Job {
     }
 
     async run() {
-        return Promise
-            .resolve()
-            .then(async () => {
-            this.setState(STATES.RUNNING);
-            try {
-                const res = await this.callback();
-                this.setState(STATES.PENDING);
-                return res;
-            } catch (error) {
-                this.setState(STATES.FAILED);
-                throw error;
-            }
-        });
+        this.setState(STATES.RUNNING);
+        try {
+            const res = await this.callback();
+            this.setState(STATES.PENDING);
+            return res;
+        } catch (error) {
+            this.setState(STATES.FAILED);
+            throw error;
+        }
     }
 }

@@ -1,18 +1,19 @@
 import Job, {STATES as JOB_STATES} from './index.js';
 
 const JOB_TYPE = 'usage-report';
-const JOB_SCHEDULE = '* * * *';
 const JOB_VALUE = 'return value';
 
 describe('Job', () => {
     const job = new Job(
         JOB_TYPE,
-        JOB_SCHEDULE,
         async () => {
-            console.log('Hello from test job');
             return JOB_VALUE;
         }
     );
+    
+    it(`type should have an ID`, () => {
+        expect(job.getId()).not.toBeFalsy();
+    });
 
     it(`type should be ${JOB_TYPE}`, () => {
         expect(job.getType()).toBe(JOB_TYPE);
@@ -22,16 +23,18 @@ describe('Job', () => {
         expect(job.getState()).toBe(JOB_STATES.PENDING);
     });
 
-    it('should have a schedule', () => {
-        expect(job.getSchedule()).toBe(JOB_SCHEDULE);
-    });
-
     it('should be runnable', () => {
         expect(typeof job.callback).toBe('function');
     });
 
+    it('throw an error if no callback is given', () => {
+        expect(() => {
+            new Job();
+        }).toThrowError();
+    });
+
     it('should be on status running during run', (done) => {
-        const job = new Job('', '', () => {
+        const job = new Job('', () => {
             expect(job.getState()).toBe(JOB_STATES.RUNNING);
             done();
         });
@@ -58,7 +61,7 @@ describe('Job', () => {
     });
 
     it('should have failed status when throwing an error', (done) => {
-        const job = new Job('', '', () => {
+        const job = new Job('', () => {
             throw new Error('This is test error');
         });
 

@@ -3,7 +3,7 @@ import Job, {STATES as JOB_STATES} from './index.js';
 const JOB_TYPE = 'usage-report';
 const JOB_VALUE = 'return value';
 
-describe('Job', () => {
+describe('Job Model', () => {
     const job = new Job(
         JOB_TYPE,
         {millisecond: 0, recurrent: false},
@@ -12,15 +12,15 @@ describe('Job', () => {
         }
     );
     
-    it(`type should have an ID`, () => {
+    it('should have an ID', () => {
         expect(job.getId()).not.toBeFalsy();
     });
 
-    it(`type should be type ${JOB_TYPE}`, () => {
+    it(`should be type ${JOB_TYPE}`, () => {
         expect(job.getType()).toBe(JOB_TYPE);
     });
 
-    it(`type should have a schdule`, () => {
+    it('should have a schdule', () => {
         expect(job.getSchedule()).toEqual(
             expect.objectContaining({
             millisecond: 0,

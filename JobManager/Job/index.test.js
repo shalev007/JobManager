@@ -71,7 +71,7 @@ describe('Job Model', () => {
 
     it('should have failed status when throwing an error', (done) => {
         const job = new Job('', {millisecond: 0, recurrent: false}, () => {
-            throw new Error('This is test error');
+            throw new Error();
         });
 
         job

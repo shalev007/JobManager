@@ -41,11 +41,10 @@ describe('JobManager', () => {
         }, 10)
     }, 20);
 
-    it(`should run jobs concurrently`, (done) => {
+    it('should run jobs concurrently', (done) => {
         // slow
         JobManager.registerJob(JOB_TYPE, { millisecond: 0, recurrent: false }, async () => {
             await wait(200);
-            // do nothing
         });
 
         // fast
@@ -61,4 +60,25 @@ describe('JobManager', () => {
             JobManager.runJobsFromQeue();
         }, 0);
     }, 500);
+
+    it('should inspect current statistics', () => {
+        expect(JobManager.inspect()).toEqual(
+            expect.objectContaining({
+                totalJobs: 0,
+                queueSize: 0,
+                runningJobs: 0,
+            })
+        );
+    });
+
+    it('should stop running jobs and clear queue', (done) => {
+        JobManager.registerJob(JOB_TYPE, { millisecond: 100, recurrent: true }, () => {});
+        JobManager.run();
+
+        setTimeout(() => {
+            JobManager.clear();
+            expect(JobManager.eventQueue.length).toBe(0);
+            done();
+        }, 200);
+    }, 300)
 })

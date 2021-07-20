@@ -93,7 +93,7 @@ export default {
         });
     },
     
-    getStats() {
+    inspect() {
         const runningJobs = this.totalJobs.filter(({job}) => {
             return job.getState() == STATES.RUNNING;
         })

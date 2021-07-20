@@ -15,7 +15,7 @@ export default class Job {
         this.type = type || 'General';
         this.schedule = schedule;
         this.callback = callback;
-        this.setState(STATES.PENDING);
+        this.state = STATES.PENDING;
 
         // store new job object
         const { _id } = JobStore.insert(
@@ -26,6 +26,11 @@ export default class Job {
         );
 
         this.id = _id;
+
+        // lifecycle additional functions
+        this.beforeAction = null;
+        this.afterAction = null;
+        this.failedAction = null;
     }
 
     getId() {
@@ -52,14 +57,47 @@ export default class Job {
         return this.state;
     }
 
+    setBeforeRun(callback) {
+        this.beforeAction = callback;
+    }
+
+    setAfterRun(callback) {
+        this.afterAction = callback;
+    }
+
+    setAfterFailed(callback) {
+        this.failedAction = callback;
+    }
+
+    async beforeRun() {
+        this.beforeAction && this.beforeAction();
+    }
+
+    async afterRun(response) {
+        this.afterAction && this.afterAction(response);
+    }
+
+    async afterFailed(error) {
+        this.failedAction && this.failedAction(error);
+    }
+
+    clearLifecycleActions() {
+        this.beforeAction = null;
+        this.afterAction = null;
+        this.failedAction = null;
+    }
+
     async run() {
         this.setState(STATES.RUNNING);
         try {
+            await this.beforeRun();
             const res = await this.callback();
             this.setState(STATES.PENDING);
+            await this.afterRun(res);
             return res;
         } catch (error) {
             this.setState(STATES.FAILED);
+            await this.afterFailed(error);
             throw error;
         }
     }

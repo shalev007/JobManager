@@ -21,7 +21,6 @@
   "homepage": "https://github.com/shalev007/JobManager#readme",
   "dependencies": {
     "@types/jest": "^26.0.24",
-    "express": "^4.17.1",
     "jest": "^27.0.6",
     "uuid": "^8.3.2"
   }

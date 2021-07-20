@@ -19,13 +19,13 @@ describe('JobManager', () => {
     it('should add job to queue', (done) => {
         JobManager.registerJob(JOB_TYPE, { millisecond: 0, recurrent: false }, () => {});
         setTimeout(() => {
-            expect(JobManager.jobQueue.length).toBe(1);
+            expect(JobManager.eventQueue.length).toBe(1);
             done();
         }, 0)
-    }, 200);
+    }, 20);
 
     it(`should pop ${MAX_RUNNING_JOBS} job from queue`, (done) => {
-        const additionalJobs = 2;
+        const additionalJobs = 1;
         let i = MAX_RUNNING_JOBS + additionalJobs;
         while(i--) {
             JobManager.registerJob(JOB_TYPE, { millisecond: 0, recurrent: false }, () => {});
@@ -33,13 +33,13 @@ describe('JobManager', () => {
 
         setTimeout(() => {
             // jobs popped
-            const jobs = JobManager.getJobsFromQueue();
+            const jobs = JobManager.getEventsFromQueue();
             expect(jobs.length).toBe(MAX_RUNNING_JOBS);
             // jobs remained in queue
-            expect(JobManager.jobQueue.length).toBe(additionalJobs);
+            expect(JobManager.eventQueue.length).toBe(additionalJobs);
             done();
         }, 10)
-    });
+    }, 20);
 
     it(`should run jobs concurrently`, (done) => {
         // slow

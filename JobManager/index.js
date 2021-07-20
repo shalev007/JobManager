@@ -8,7 +8,7 @@ export const MAX_QUEUE_SIZE = 500;
 // cached singleton
 export default {
     totalJobs: [],
-    jobQueue: [],
+    eventQueue: [],
     mainTimerId: null,
 
     registerJob(type = '', schedule = {}, callback = () => {}) {
@@ -39,15 +39,43 @@ export default {
 
     addJobToQueue(job) {
         // if queue is full stash job for later on the engine event queue
-        if (this.jobQueue.length > MAX_QUEUE_SIZE) {
+        if (this.eventQueue.length > MAX_QUEUE_SIZE) {
             setTimeout(() => {
                 this.addJobToQueue(job);
             }, 0)
         }
 
-        this.jobQueue.push(job);
+        this.eventQueue.push(new Event(job));
     },
 
+    
+    getEventsFromQueue() {
+        // don't run if queue is empty
+        if(!this.eventQueue.length) {
+            return [];
+        }
+        
+        const events = [];
+        
+        // limit current running jobs to max of 5
+        let i = Math.min(MAX_RUNNING_JOBS, this.eventQueue.length);
+        while(i--) {
+            events.push(this.eventQueue.shift());
+        }
+        
+        return events;
+    },
+    
+    async runJobsFromQeue() {
+        const events = this.getEventsFromQueue();
+        if(!events.length) {
+            return;
+        }
+        
+        // run jobs async
+        Promise.all(events.map(event => event.getJob().run()))
+    },
+    
     run() {
         this.mainTimerId = setInterval(this.runJobsFromQeue.bind(this), TICK_TIME);
     },
@@ -64,34 +92,7 @@ export default {
             }
         });
     },
-
-    getJobsFromQueue() {
-        // don't run if queue is empty
-        if(!this.jobQueue.length) {
-            return [];
-        }
-
-        const jobs = [];
-
-        // limit current running jobs to max of 5
-        let i = Math.min(MAX_RUNNING_JOBS, this.jobQueue.length);
-        while(i--) {
-            jobs.push(this.jobQueue.shift());
-        }
-
-        return jobs;
-    },
     
-    async runJobsFromQeue() {
-        const jobs = this.getJobsFromQueue();
-        if(!jobs.length) {
-            return;
-        }
-
-        // run jobs async
-        Promise.all(jobs.map(job => job.run()))
-    },
-
     getStats() {
         const runningJobs = this.totalJobs.filter(({job}) => {
             return job.getState() == STATES.RUNNING;
@@ -99,14 +100,14 @@ export default {
 
         return {
             totalJobs: this.totalJobs.length,
-            queueSize: this.jobQueue.length,
-            runningJobs: runningJobs.length
+            queueSize: this.eventQueue.length,
+            runningJobs: runningJobs.length,
         };
     },
 
     clear() {
         this.stop();
         this.totalJobs = [];
-        this.jobQueue = [];
+        this.eventQueue = [];
     }
 };

@@ -12,6 +12,7 @@ export default class Event {
         this.state = STATES.PENDING;
         const { _id } = EventStore.insert(job, this.state);
         this.id = _id;
+        this.addJobLifecycleMethods();
     }
 
     getId() {
@@ -32,5 +33,25 @@ export default class Event {
         EventStore.update(this.id, { state });
 
         return this;
+    }
+
+    addJobLifecycleMethods() {
+        const job = this.getJob();
+
+        job.setAfterRun(value => {
+            this.setState(STATES.SUCCESS);
+            job.clearLifecycleActions();
+
+            // save the returned value
+            EventStore.update(this.id, { value });
+        });
+
+        job.setAfterFailed(error => {
+            this.setState(STATES.FAILED);
+            job.clearLifecycleActions();
+
+            // save the error
+            EventStore.update(this.id, { value: error.message });
+        });
     }
 };

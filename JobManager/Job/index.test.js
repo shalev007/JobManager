@@ -82,16 +82,6 @@ describe('Job Model', () => {
         })
     }, 20);
 
-    it('should run a before run function', (done) => {
-        const job = new Job('', {millisecond: 0, recurrent: false}, () => {});
-        job.setBeforeRun(() => {
-            expect(job.getState()).toBe(JOB_STATES.RUNNING);
-            done();
-        });
-
-        job.run();
-    }, 20);
-
     it('should run an after run function', (done) => {
         const value = 1;
         const job = new Job('', {millisecond: 0, recurrent: false}, () => value);

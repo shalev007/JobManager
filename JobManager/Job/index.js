@@ -28,7 +28,6 @@ export default class Job {
         this.id = _id;
 
         // lifecycle additional functions
-        this.beforeAction = null;
         this.afterAction = null;
         this.failedAction = null;
     }
@@ -57,20 +56,12 @@ export default class Job {
         return this.state;
     }
 
-    setBeforeRun(callback) {
-        this.beforeAction = callback;
-    }
-
     setAfterRun(callback) {
         this.afterAction = callback;
     }
 
     setAfterFailed(callback) {
         this.failedAction = callback;
-    }
-
-    async beforeRun() {
-        this.beforeAction && this.beforeAction();
     }
 
     async afterRun(response) {
@@ -82,7 +73,6 @@ export default class Job {
     }
 
     clearLifecycleActions() {
-        this.beforeAction = null;
         this.afterAction = null;
         this.failedAction = null;
     }
@@ -90,7 +80,6 @@ export default class Job {
     async run() {
         this.setState(STATES.RUNNING);
         try {
-            await this.beforeRun();
             const res = await this.callback();
             this.setState(STATES.PENDING);
             await this.afterRun(res);

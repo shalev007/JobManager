@@ -34,7 +34,7 @@ export default {
             }, schedule.millisecond);
         }
 
-        this.totalJobs.push({job, schedule, timerId});
+        this.totalJobs.push({job, timerId});
     },
 
     addJobToQueue(job) {
@@ -84,11 +84,11 @@ export default {
         clearInterval(this.mainTimerId);
 
         // clear all job scheduling
-        this.totalJobs.forEach(jobData => {
-            if(jobData.recurrent) {
-                clearInterval(jobData.timerId);
+        this.totalJobs.forEach(({job, timerId}) => {
+            if(job.getSchedule().recurrent) {
+                clearInterval(timerId);
             } else {
-                clearTimeout(jobData.timerId);
+                clearTimeout(timerId);
             }
         });
     },

@@ -61,7 +61,7 @@ npm run test
 ```
 
 ## Authors
-Shalev King Avhar
+Shalev Da King Avhar
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

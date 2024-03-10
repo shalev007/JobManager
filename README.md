@@ -60,7 +60,7 @@ Use [Jest.js](https://github.com/facebook/jest) to test
 npm run test
 ```
 
-## Author
+## Authore
 Shalev Avhar
 
 ## License
